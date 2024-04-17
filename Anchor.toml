@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-hyper_wallet_program = "427T48CftuHif3sRLvaZp859Dzk1YCzUZAg2ooFCdiVK"
+hyper_wallet_program = "HYPERhd7VFrTzbRLyGsRcGQZkSfaKUGKAY8XDbaY5AgL"
 
 [registry]
 url = "https://api.apr.dev"
