@@ -13,7 +13,11 @@ import {
 import {LAMPORTS_PER_SOL} from "@solana/web3.js";
 import {program} from "./utils";
 import BN from "bn.js";
-import {createTransferInstruction, getOrCreateAssociatedTokenAccount} from "@solana/spl-token";
+import {
+    createTransferInstruction,
+    getAssociatedTokenAddressSync,
+    getOrCreateAssociatedTokenAccount
+} from "@solana/spl-token";
 
 export const testTransferSPL = () => {
     let splMintAddress: anchor.web3.PublicKey;
