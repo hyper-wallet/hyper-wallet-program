@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 use instructions::*;
+pub mod errors;
 pub mod instructions;
 pub mod state;
-pub mod errors;
 
 declare_id!("HYPERhd7VFrTzbRLyGsRcGQZkSfaKUGKAY8XDbaY5AgL");
 
@@ -20,5 +20,24 @@ pub mod hyper_wallet_program {
 
     pub fn transfer_spl(ctx: Context<TransferSPL>, amount: u64) -> Result<()> {
         instructions::transfer_spl::transfer_spl(ctx, amount)
+    }
+
+    pub fn enable_white_list(ctx: Context<EnableWhiteList>) -> Result<()> {
+        instructions::white_list::enable_white_list(ctx)
+    }
+
+    pub fn disable_white_list(ctx: Context<DisableWhiteList>) -> Result<()> {
+        instructions::white_list::disable_white_list(ctx)
+    }
+
+    pub fn add_to_white_list(ctx: Context<AddToWhiteList>, address: Pubkey) -> Result<()> {
+        instructions::white_list::add_to_white_list(ctx, address)
+    }
+
+    pub fn remove_from_white_list(
+        ctx: Context<RemoveFromWhiteList>,
+        address: Pubkey,
+    ) -> Result<()> {
+        instructions::white_list::remove_from_white_list(ctx, address)
     }
 }
