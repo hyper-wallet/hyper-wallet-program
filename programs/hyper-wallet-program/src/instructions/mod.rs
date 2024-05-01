@@ -1,8 +1,12 @@
 pub use create_hyper_wallet::*;
+pub use otp::*;
+pub use spending_limit::*;
 pub use transfer_lamports::*;
 pub use transfer_spl::*;
-pub use white_list::*;
+pub use whitelist::*;
 pub mod create_hyper_wallet;
+pub mod otp;
+pub mod spending_limit;
 pub mod transfer_lamports;
 pub mod transfer_spl;
-pub mod white_list;
+pub mod whitelist;

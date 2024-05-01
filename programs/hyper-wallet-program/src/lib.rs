@@ -22,22 +22,49 @@ pub mod hyper_wallet_program {
         instructions::transfer_spl::transfer_spl(ctx, amount)
     }
 
-    pub fn enable_white_list(ctx: Context<EnableWhiteList>) -> Result<()> {
-        instructions::white_list::enable_white_list(ctx)
+    pub fn enable_whitelist(ctx: Context<EnableWhiteList>) -> Result<()> {
+        instructions::whitelist::enable_whitelist(ctx)
     }
 
-    pub fn disable_white_list(ctx: Context<DisableWhiteList>) -> Result<()> {
-        instructions::white_list::disable_white_list(ctx)
+    pub fn disable_whitelist(ctx: Context<DisableWhiteList>) -> Result<()> {
+        instructions::whitelist::disable_whitelist(ctx)
     }
 
-    pub fn add_to_white_list(ctx: Context<AddToWhiteList>, address: Pubkey) -> Result<()> {
-        instructions::white_list::add_to_white_list(ctx, address)
+    pub fn add_to_whitelist(ctx: Context<AddToWhiteList>, address: Pubkey) -> Result<()> {
+        instructions::whitelist::add_to_whitelist(ctx, address)
     }
 
-    pub fn remove_from_white_list(
-        ctx: Context<RemoveFromWhiteList>,
-        address: Pubkey,
+    pub fn remove_from_whitelist(ctx: Context<RemoveFromWhiteList>, address: Pubkey) -> Result<()> {
+        instructions::whitelist::remove_from_whitelist(ctx, address)
+    }
+
+    pub fn enable_otp(ctx: Context<EnableOtp>) -> Result<()> {
+        instructions::otp::enable_otp(ctx)
+    }
+
+    pub fn disable_otp(ctx: Context<DisableOtp>) -> Result<()> {
+        instructions::otp::disable_otp(ctx)
+    }
+
+    pub fn set_spending_limit_lamports(
+        ctx: Context<SetSpendingLimitLamports>,
+        amount: u64,
     ) -> Result<()> {
-        instructions::white_list::remove_from_white_list(ctx, address)
+        instructions::spending_limit::set_spending_limit_lamports(ctx, amount)
+    }
+
+    pub fn remove_spending_limit_lamports(ctx: Context<RemoveSpendingLimitLamports>) -> Result<()> {
+        instructions::spending_limit::remove_spending_limit_lamports(ctx)
+    }
+
+    pub fn set_spending_limit_spl(
+        ctx: Context<SetSpendingLimitSpl>,
+        raw_amount: u64,
+    ) -> Result<()> {
+        instructions::spending_limit::set_spending_limit_spl(ctx, raw_amount)
+    }
+
+    pub fn remove_spending_limit_spl(ctx: Context<RemoveSpendingLimitSpl>) -> Result<()> {
+        instructions::spending_limit::remove_spending_limit_spl(ctx)
     }
 }

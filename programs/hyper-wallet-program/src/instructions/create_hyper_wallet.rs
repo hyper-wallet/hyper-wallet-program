@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 
 pub fn create_hyper_wallet(ctx: Context<CreateHyperWallet>) -> Result<()> {
     ctx.accounts.hyper_wallet.owner = ctx.accounts.owner.key();
-    ctx.accounts.hyper_wallet.white_list_enabled = false;
+    ctx.accounts.hyper_wallet.whitelist_enabled = false;
     Ok(())
 }
 
