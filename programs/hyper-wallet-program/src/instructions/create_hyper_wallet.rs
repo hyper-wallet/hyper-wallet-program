@@ -2,8 +2,12 @@ use crate::state::hyper_wallet::*;
 use anchor_lang::prelude::*;
 
 pub fn create_hyper_wallet(ctx: Context<CreateHyperWallet>) -> Result<()> {
-    ctx.accounts.hyper_wallet.owner = ctx.accounts.owner.key();
-    ctx.accounts.hyper_wallet.whitelist_enabled = false;
+    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    hyper_wallet.owner = ctx.accounts.owner.key();
+    hyper_wallet.whitelist_enabled = false;
+    hyper_wallet.whitelisted_addresses = vec![];
+    hyper_wallet.otp_enabled = false;
+    hyper_wallet.spending_limit = 0;
     Ok(())
 }
 
