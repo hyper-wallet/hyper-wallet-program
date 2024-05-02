@@ -46,6 +46,17 @@ pub mod hyper_wallet_program {
         instructions::otp::disable_otp(ctx)
     }
 
+    pub fn set_up_otp(ctx: Context<SetUpOtp>, set_up_otp_params: SetUpOtpParams) -> Result<()> {
+        instructions::otp::set_up_otp(ctx, set_up_otp_params)
+    }
+
+    pub fn confirm_otp(
+        ctx: Context<ConfirmOtp>,
+        confirm_otp_params: ConfirmOtpParams,
+    ) -> Result<()> {
+        instructions::otp::confirm_otp(ctx, confirm_otp_params)
+    }
+
     pub fn set_spending_limit_lamports(
         ctx: Context<SetSpendingLimitLamports>,
         amount: u64,
