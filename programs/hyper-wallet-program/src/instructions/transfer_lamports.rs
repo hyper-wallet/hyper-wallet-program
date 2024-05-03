@@ -1,7 +1,10 @@
-use anchor_lang::prelude::*;
 use crate::state::hyper_wallet::*;
+use anchor_lang::{prelude::*, solana_program::lamports};
 
-pub fn transfer_lamports(ctx: Context<TransferLamports>, lamports: u64) -> Result<()> {
+pub fn transfer_lamports(
+    ctx: Context<TransferLamports>,
+    params: TransferLamportsParams,
+) -> Result<()> {
     // The code below normally work, but it wont work in this situation
     // Explanation below
     // ---
@@ -32,9 +35,29 @@ pub fn transfer_lamports(ctx: Context<TransferLamports>, lamports: u64) -> Resul
     // Fortunately, Anchor has addressed this problem.
     // https://github.com/coral-xyz/anchor/pull/2552
 
+    let TransferLamportsParams {
+        lamports,
+        otp_hash,
+        proof_hash,
+    } = params;
+
+    let hyper_wallet = &mut ctx.accounts.from_hyper_wallet;
+
+    if let Err(e) = hyper_wallet.verify_otp(otp_hash, proof_hash) {
+        return Err(e);
+    }
+
     ctx.accounts.from_hyper_wallet.sub_lamports(lamports)?;
     ctx.accounts.to.add_lamports(lamports)?;
+
     Ok(())
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct TransferLamportsParams {
+    lamports: u64,
+    otp_hash: Option<[u8; 32]>,
+    proof_hash: Option<Vec<[u8; 32]>>,
 }
 
 #[derive(Accounts)]

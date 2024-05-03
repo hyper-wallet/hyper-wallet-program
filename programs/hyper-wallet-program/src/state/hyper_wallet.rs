@@ -1,6 +1,8 @@
 use anchor_lang::prelude::*;
 use rs_merkle::{algorithms::Sha256, MerkleProof};
 
+use crate::{errors::HyperWalletError, otp};
+
 #[account]
 pub struct HyperWallet {
     pub owner: Pubkey,
@@ -13,19 +15,39 @@ pub struct HyperWallet {
 }
 
 impl HyperWallet {
-    pub fn validate_otp(&self, otp_hash: [u8; 32], proof_hash: Vec<[u8; 32]>) -> Result<bool> {
+    pub fn verify_otp(
+        &self,
+        otp_hash: Option<[u8; 32]>,
+        proof_hash: Option<Vec<[u8; 32]>>,
+    ) -> Result<()> {
         if self.otp_enabled == false {
-            return Ok(true);
+            return Ok(());
         }
+
+        require!(otp_hash.is_some(), HyperWalletError::OtpIsRequired);
+        require!(
+            proof_hash.is_some(),
+            HyperWalletError::OtpProofPathIsRequired,
+        );
+
+        let otp_hash = otp_hash.unwrap();
+        let proof_hash = proof_hash.unwrap();
 
         let current_time = Clock::get()?.unix_timestamp;
         let init_time = self.otp_init_time;
         let interval = ((current_time - init_time as i64) / 1) as usize;
+
         let proof_hash_copy = proof_hash.clone();
-        let leave_hash = otp_hash;
-        let root = self.otp_root;
         let proof = MerkleProof::<Sha256>::new(proof_hash_copy);
+        let root = self.otp_root;
         let indices_to_prove = vec![interval];
-        Ok(proof.verify(root, &indices_to_prove, &[leave_hash], usize::pow(2, 10)))
+        let leave_hash = otp_hash;
+
+        require!(
+            proof.verify(root, &indices_to_prove, &[leave_hash], usize::pow(2, 10)),
+            HyperWalletError::OtpIsInvalid
+        );
+
+        Ok(())
     }
 }
