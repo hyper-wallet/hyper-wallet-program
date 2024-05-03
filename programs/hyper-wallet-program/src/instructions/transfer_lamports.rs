@@ -1,5 +1,5 @@
 use crate::state::hyper_wallet::*;
-use anchor_lang::{prelude::*, solana_program::lamports};
+use anchor_lang::prelude::*;
 
 pub fn transfer_lamports(
     ctx: Context<TransferLamports>,

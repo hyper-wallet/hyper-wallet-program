@@ -1,7 +1,6 @@
+use crate::errors::HyperWalletError;
 use anchor_lang::prelude::*;
 use rs_merkle::{algorithms::Sha256, MerkleProof};
-
-use crate::{errors::HyperWalletError, otp};
 
 #[account]
 pub struct HyperWallet {
