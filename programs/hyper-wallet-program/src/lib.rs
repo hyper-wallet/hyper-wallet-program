@@ -14,6 +14,10 @@ pub mod hyper_wallet_program {
         instructions::create_hyper_wallet::create_hyper_wallet(ctx)
     }
 
+    pub fn close_hyper_wallet(ctx: Context<CloseHyperWallet>) -> Result<()> {
+        instructions::close_hyper_wallet::close_hyper_wallet(ctx)
+    }
+
     pub fn transfer_lamports(
         ctx: Context<TransferLamports>,
         params: TransferLamportsParams,
