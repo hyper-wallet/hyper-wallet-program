@@ -42,8 +42,12 @@ pub fn transfer_lamports(
     } = params;
 
     let hyper_wallet = &mut ctx.accounts.from_hyper_wallet;
+    let to = &mut ctx.accounts.to;
 
     if let Err(e) = hyper_wallet.verify_otp(otp_hash, proof_hash) {
+        return Err(e);
+    }
+    if let Err(e) = hyper_wallet.verify_receiver(to.key()) {
         return Err(e);
     }
 

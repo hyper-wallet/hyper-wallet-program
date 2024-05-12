@@ -9,4 +9,5 @@ pub enum HyperWalletError {
     IllegalHyperWalletOwner,
     AddressAlreadyWhiteListed,
     AddressNotWhiteListed,
+    SpendingLimitExceeded,
 }

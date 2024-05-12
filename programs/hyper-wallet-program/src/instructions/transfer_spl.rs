@@ -11,9 +11,13 @@ pub fn transfer_spl(ctx: Context<TransferSPL>, params: TransferSplParams) -> Res
 
     let hyper_wallet = &mut ctx.accounts.from_hyper_wallet;
     let hyper_wallet_ata = &mut ctx.accounts.from_hyper_wallet_ata;
+    let to = &mut ctx.accounts.to;
     let to_ata = &mut ctx.accounts.to_ata;
 
     if let Err(e) = hyper_wallet.verify_otp(otp_hash, proof_hash) {
+        return Err(e);
+    }
+    if let Err(e) = hyper_wallet.verify_receiver(to.key()) {
         return Err(e);
     }
 
@@ -50,7 +54,8 @@ pub struct TransferSPL<'info> {
     pub from_hyper_wallet: Account<'info, HyperWallet>,
     #[account(mut)]
     pub from_hyper_wallet_ata: Account<'info, TokenAccount>,
-    #[account(mut)]
+    pub to: SystemAccount<'info>,
+    #[account(mut, token::mint = to)]
     /// CHECK:
     pub to_ata: Account<'info, TokenAccount>,
     pub hyper_wallet_owner: Signer<'info>,

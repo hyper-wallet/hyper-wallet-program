@@ -13,14 +13,14 @@ pub fn disable_whitelist(ctx: Context<DisableWhiteList>) -> Result<()> {
 }
 
 pub fn add_to_whitelist(ctx: Context<AddToWhiteList>, address: Pubkey) -> Result<()> {
-    let mut whitelisted_addresses = &mut ctx.accounts.hyper_wallet.whitelisted_addresses;
+    let whitelisted_addresses = &mut ctx.accounts.hyper_wallet.whitelisted_addresses;
     whitelisted_addresses.push(address);
     whitelisted_addresses.sort();
     Ok(())
 }
 
 pub fn remove_from_whitelist(ctx: Context<RemoveFromWhiteList>, address: Pubkey) -> Result<()> {
-    let mut whitelisted_addresses = &mut ctx.accounts.hyper_wallet.whitelisted_addresses;
+    let whitelisted_addresses = &mut ctx.accounts.hyper_wallet.whitelisted_addresses;
     let index_to_remove = match whitelisted_addresses.binary_search(&address) {
         Ok(index_to_remove) => index_to_remove,
         Err(_e) => return err!(HyperWalletError::AddressNotWhiteListed),

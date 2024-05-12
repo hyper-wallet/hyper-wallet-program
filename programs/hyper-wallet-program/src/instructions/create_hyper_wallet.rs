@@ -7,7 +7,8 @@ pub fn create_hyper_wallet(ctx: Context<CreateHyperWallet>) -> Result<()> {
     hyper_wallet.whitelist_enabled = false;
     hyper_wallet.whitelisted_addresses = vec![];
     hyper_wallet.otp_enabled = false;
-    hyper_wallet.spending_limit = 0;
+    hyper_wallet.spending_limit_enabled = false;
+    hyper_wallet.spending_limits = vec![];
     Ok(())
 }
 
