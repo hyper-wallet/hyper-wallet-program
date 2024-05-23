@@ -21,12 +21,12 @@ pub fn set_up_otp(ctx: Context<SetUpOtp>, set_up_otp_params: SetUpOtpParams) -> 
     Ok(())
 }
 
-pub fn confirm_otp(ctx: Context<ConfirmOtp>, confirm_otp_params: ConfirmOtpParams) -> Result<()> {
+pub fn verify_otp(ctx: Context<VerifyOtp>, verify_otp_params: VerifyOtpParams) -> Result<()> {
     let current_time = Clock::get()?.unix_timestamp;
     let init_time = ctx.accounts.hyper_wallet.otp_init_time;
     let interval = ((current_time - init_time as i64) / 1) as usize;
-    let proof_hash_copy = confirm_otp_params.proof_hash.clone();
-    let leave_hash = confirm_otp_params.otp_hash;
+    let proof_hash_copy = verify_otp_params.proof_hash.clone();
+    let leave_hash = verify_otp_params.otp_hash;
     let root = ctx.accounts.hyper_wallet.otp_root;
     let proof = MerkleProof::<Sha256>::new(proof_hash_copy);
     let indices_to_prove = vec![interval];
@@ -42,7 +42,7 @@ pub struct SetUpOtpParams {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct ConfirmOtpParams {
+pub struct VerifyOtpParams {
     pub otp_hash: [u8; 32],
     pub proof_hash: Vec<[u8; 32]>,
 }
@@ -69,7 +69,7 @@ pub struct SetUpOtp<'info> {
 }
 
 #[derive(Accounts)]
-pub struct ConfirmOtp<'info> {
+pub struct VerifyOtp<'info> {
     #[account(mut, seeds = [hyper_wallet_owner.key().as_ref()], bump)]
     pub hyper_wallet: Account<'info, HyperWallet>,
     pub hyper_wallet_owner: Signer<'info>,

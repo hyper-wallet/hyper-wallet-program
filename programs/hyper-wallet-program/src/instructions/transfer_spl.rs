@@ -20,6 +20,9 @@ pub fn transfer_spl(ctx: Context<TransferSPL>, params: TransferSplParams) -> Res
     if let Err(e) = hyper_wallet.verify_receiver(to.key()) {
         return Err(e);
     }
+    if let Err(e) = hyper_wallet.verify_and_record_payment(to_ata.key(), raw_amount) {
+        return Err(e);
+    }
 
     let bump_vector = ctx.bumps.from_hyper_wallet.to_le_bytes();
     let binding = ctx.accounts.hyper_wallet_owner.key();
@@ -54,8 +57,9 @@ pub struct TransferSPL<'info> {
     pub from_hyper_wallet: Account<'info, HyperWallet>,
     #[account(mut)]
     pub from_hyper_wallet_ata: Account<'info, TokenAccount>,
-    pub to: SystemAccount<'info>,
-    #[account(mut, token::mint = to)]
+    /// CHECK:
+    pub to: AccountInfo<'info>,
+    #[account(mut)]
     /// CHECK:
     pub to_ata: Account<'info, TokenAccount>,
     pub hyper_wallet_owner: Signer<'info>,

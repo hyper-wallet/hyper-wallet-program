@@ -1,22 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
-import {
-  fundWithSol,
-  fundWithSpl,
-  getSPLBalance,
-  program,
-  provider,
-  SPL_TOKEN_DECIMALS,
-} from "./utils";
-import {
-  createTransferInstruction,
-  getOrCreateAssociatedTokenAccount,
-} from "@solana/spl-token";
-import { assert } from "chai";
+import { program } from "./utils";
+import { assert, expect } from "chai";
 
 export function testWhiteList() {
   let ownerKeypair: anchor.web3.Keypair;
   let hyperWalletPDA: anchor.web3.PublicKey;
   let keypair: anchor.web3.Keypair;
+
   before(async () => {
     ownerKeypair = new anchor.web3.Keypair();
     hyperWalletPDA = anchor.web3.PublicKey.findProgramAddressSync(
@@ -34,9 +24,10 @@ export function testWhiteList() {
       .signers([ownerKeypair])
       .rpc();
   });
+
   it("Can enable white list", async () => {
     await program.methods
-      .enableWhiteList()
+      .enableWhitelist()
       .accounts({
         hyperWallet: hyperWalletPDA,
         hyperWalletOwner: ownerKeypair.publicKey,
@@ -47,26 +38,12 @@ export function testWhiteList() {
     const hyperWalletAccount = await program.account.hyperWallet.fetch(
       hyperWalletPDA
     );
-    assert.equal(hyperWalletAccount.whiteListEnabled, true);
+    assert.equal(hyperWalletAccount.whitelistEnabled, true);
   });
-  it("Can disable white list", async () => {
-    await program.methods
-      .disableWhiteList()
-      .accounts({
-        hyperWallet: hyperWalletPDA,
-        hyperWalletOwner: ownerKeypair.publicKey,
-      })
-      .signers([ownerKeypair])
-      .rpc();
 
-    const hyperWalletAccount = await program.account.hyperWallet.fetch(
-      hyperWalletPDA
-    );
-    assert.equal(hyperWalletAccount.whiteListEnabled, false);
-  });
   it("Can add to white list", async () => {
     await program.methods
-      .addToWhiteList(keypair.publicKey)
+      .addToWhitelist(keypair.publicKey)
       .accounts({
         hyperWallet: hyperWalletPDA,
         hyperWalletOwner: ownerKeypair.publicKey,
@@ -78,13 +55,25 @@ export function testWhiteList() {
       hyperWalletPDA
     );
     assert.include(
-      hyperWalletAccount.whiteListedAddresses.map((a) => a.toString()),
+      hyperWalletAccount.whitelistedAddresses.map((a) => a.toString()),
       keypair.publicKey.toString()
     );
   });
+
+  it("Can verify a receiver that is whitelisted", async () => {
+    await program.methods
+      .verifyReceiver(keypair.publicKey)
+      .accounts({
+        hyperWallet: hyperWalletPDA,
+        hyperWalletOwner: ownerKeypair.publicKey,
+      })
+      .signers([ownerKeypair])
+      .rpc();
+  });
+
   it("Can remove from white list", async () => {
     await program.methods
-      .removeFromWhiteList(keypair.publicKey)
+      .removeFromWhitelist(keypair.publicKey)
       .accounts({
         hyperWallet: hyperWalletPDA,
         hyperWalletOwner: ownerKeypair.publicKey,
@@ -96,8 +85,39 @@ export function testWhiteList() {
       hyperWalletPDA
     );
     assert.notInclude(
-      hyperWalletAccount.whiteListedAddresses.map((a) => a.toString()),
+      hyperWalletAccount.whitelistedAddresses.map((a) => a.toString()),
       keypair.publicKey.toString()
     );
+  });
+
+  it("Can verify a receiver that is not whitelisted", async () => {
+    try {
+      await program.methods
+        .verifyReceiver(keypair.publicKey)
+        .accounts({
+          hyperWallet: hyperWalletPDA,
+          hyperWalletOwner: ownerKeypair.publicKey,
+        })
+        .signers([ownerKeypair])
+        .rpc();
+    } catch (e) {
+      expect(e).to.not.null;
+    }
+  });
+
+  it("Can disable white list", async () => {
+    await program.methods
+      .disableWhitelist()
+      .accounts({
+        hyperWallet: hyperWalletPDA,
+        hyperWalletOwner: ownerKeypair.publicKey,
+      })
+      .signers([ownerKeypair])
+      .rpc();
+
+    const hyperWalletAccount = await program.account.hyperWallet.fetch(
+      hyperWalletPDA
+    );
+    assert.equal(hyperWalletAccount.whitelistEnabled, false);
   });
 }

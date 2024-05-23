@@ -1,7 +1,7 @@
 use crate::state::hyper_wallet::*;
 use anchor_lang::prelude::*;
 
-pub fn close_hyper_wallet(ctx: Context<CloseHyperWallet>) -> Result<()> {
+pub fn close_hyper_wallet(_ctx: Context<CloseHyperWallet>) -> Result<()> {
     Ok(())
 }
 

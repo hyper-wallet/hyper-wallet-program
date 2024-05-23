@@ -12,7 +12,7 @@ export function testOtp() {
 
   let secretKey: string; // When implemented on mobile, this will be replaced by authenticator app
   let tree: MerkleTree; // When implemented on mobile, this will be replaced by storing the tree in secure store
-  const PERIOD_IN_SECONDS = 1; // a period of 30 seconds for generating otp codes
+  const PERIOD_IN_SECONDS = 30; // a period of 30 seconds for generating otp codes
   const OTP_CODE_AMOUNT = Math.pow(2, 10);
   let initTimeInSeconds: number;
 
@@ -36,7 +36,8 @@ export function testOtp() {
 
   it("Can set up otp", async () => {
     // Generate random secret
-    initTimeInSeconds = Math.floor(Date.now() / 1000);
+    initTimeInSeconds =
+      Math.floor(Date.now() / 1000 / PERIOD_IN_SECONDS) * PERIOD_IN_SECONDS;
     secretKey = base32.Base32.encode(randomBytes(20), "RFC4648");
 
     // Generate OTP codes for 6 months + build Merkle tree
@@ -70,19 +71,15 @@ export function testOtp() {
       })
       .signers([keypair])
       .rpc();
-
-    const hyperWalletAccount = await program.account.hyperWallet.fetch(
-      hyperWalletPda
-    );
   });
 
-  it("can confirm otp", async () => {
+  it("can verify otp", async () => {
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve(true);
       }, 3000);
     });
-    // The interval is fixed to 1
+
     const currentTimestamp = Math.floor(Date.now() / 1000) * 1000;
     const otp = totp.TOTP.generate(secretKey, {
       period: PERIOD_IN_SECONDS,
@@ -93,7 +90,7 @@ export function testOtp() {
     const proofHash = proofPath.map((path) => Array.from(path.data));
 
     await program.methods
-      .confirmOtp({
+      .verifyOtp({
         otpHash: [...otpHash],
         proofHash: [...proofHash],
       })

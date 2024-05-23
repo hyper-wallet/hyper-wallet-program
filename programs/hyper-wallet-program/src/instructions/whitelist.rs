@@ -29,6 +29,14 @@ pub fn remove_from_whitelist(ctx: Context<RemoveFromWhiteList>, address: Pubkey)
     Ok(())
 }
 
+pub fn verify_receiver(ctx: Context<VerifyReceiver>, address: Pubkey) -> Result<()> {
+    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    if let Err(e) = hyper_wallet.verify_receiver(address) {
+        return Err(e);
+    }
+    Ok(())
+}
+
 #[derive(Accounts)]
 pub struct EnableWhiteList<'info> {
     #[account(mut, seeds = [hyper_wallet_owner.key().as_ref()], bump)]
@@ -53,6 +61,12 @@ pub struct AddToWhiteList<'info> {
 #[derive(Accounts)]
 pub struct RemoveFromWhiteList<'info> {
     #[account(mut, seeds = [hyper_wallet_owner.key().as_ref()], bump)]
+    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_wallet_owner: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct VerifyReceiver<'info> {
     pub hyper_wallet: Account<'info, HyperWallet>,
     pub hyper_wallet_owner: Signer<'info>,
 }

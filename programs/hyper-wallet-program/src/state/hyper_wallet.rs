@@ -6,8 +6,9 @@ use rs_merkle::{algorithms::Sha256, MerkleProof};
 pub struct SpendingLimit {
     pub ata: Pubkey,
     pub raw_amount: u64,
-    pub raw_allowance_left: u64,
+    pub total_spent: u64,
     pub last_reset: i64,
+    pub reset_period: i64,
 }
 
 #[account]
@@ -23,6 +24,67 @@ pub struct HyperWallet {
 }
 
 impl HyperWallet {
+    pub fn new(owner: Pubkey) -> Self {
+        HyperWallet {
+            owner,
+            whitelist_enabled: false,
+            whitelisted_addresses: Vec::new(),
+            otp_enabled: false,
+            otp_root: [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0,
+            ],
+            otp_init_time: 0,
+            spending_limit_enabled: false,
+            spending_limits: Vec::new(),
+        }
+    }
+    pub fn set_spending_limit(
+        &mut self,
+        ata: Pubkey,
+        raw_amount: u64,
+        reset_period: i64,
+    ) -> Result<()> {
+        let now = Clock::get()?.unix_timestamp;
+        let limit = SpendingLimit {
+            ata,
+            raw_amount,
+            total_spent: 0,
+            last_reset: now,
+            reset_period,
+        };
+        self.spending_limits.push(limit);
+
+        Ok(())
+    }
+
+    pub fn remove_spending_limit(&mut self, ata: Pubkey) -> Result<()> {
+        if let Some(index) = self.spending_limits.iter().position(|v| v.ata == ata) {
+            self.spending_limits.remove(index);
+        }
+
+        Ok(())
+    }
+
+    pub fn verify_and_record_payment(&mut self, ata: Pubkey, raw_amount: u64) -> Result<()> {
+        for limit in &mut self.spending_limits {
+            if limit.ata == ata {
+                let now = Clock::get()?.unix_timestamp;
+                if (now - limit.last_reset) >= limit.reset_period {
+                    limit.total_spent = 0;
+                    limit.last_reset = now;
+                }
+                require!(
+                    (limit.total_spent + raw_amount) > limit.raw_amount,
+                    HyperWalletError::SpendingLimitExceeded
+                );
+                limit.total_spent += raw_amount;
+                break;
+            }
+        }
+
+        Ok(())
+    }
     pub fn verify_receiver(&self, receiver: Pubkey) -> Result<()> {
         if self.whitelist_enabled == false {
             return Ok(());
@@ -41,34 +103,6 @@ impl HyperWallet {
 
         Ok(())
     }
-    // pub fn verify_spending_limit(&self, ata: Pubkey, raw_amount: u64) -> Result<()> {
-    //     if self.spending_limit_enabled == false {
-    //         return Ok(());
-    //     }
-
-    //     let mut spending_limit = match self.spending_limits.iter().find(|&v| v.ata == ata).as_mut()
-    //     {
-    //         None => return Ok(()),
-    //         Some(v) => &v,
-    //     };
-
-    //     let current_time = Clock::get()?.unix_timestamp;
-    //     if current_time - spending_limit.last_reset > 24 * 60 * 60 {
-    //         &spending_limit.last_reset = current_time;
-    //         spending_limit.raw_allowance_left = spending_limit.raw_amount;
-    //     }
-
-    //     require_gte!(
-    //         raw_amount,
-    //         spending_limit.raw_allowance_left,
-    //         HyperWalletError::SpendingLimitExceeded
-    //     );
-
-    //     spending_limit.raw_allowance_left -= raw_amount;
-
-    //     Ok(())
-    // }
-
     pub fn verify_otp(
         &self,
         otp_hash: Option<[u8; 32]>,

@@ -45,6 +45,10 @@ pub mod hyper_wallet_program {
         instructions::whitelist::remove_from_whitelist(ctx, address)
     }
 
+    pub fn verify_receiver(ctx: Context<VerifyReceiver>, address: Pubkey) -> Result<()> {
+        instructions::whitelist::verify_receiver(ctx, address)
+    }
+
     pub fn enable_otp(ctx: Context<EnableOtp>) -> Result<()> {
         instructions::otp::enable_otp(ctx)
     }
@@ -57,22 +61,8 @@ pub mod hyper_wallet_program {
         instructions::otp::set_up_otp(ctx, set_up_otp_params)
     }
 
-    pub fn confirm_otp(
-        ctx: Context<ConfirmOtp>,
-        confirm_otp_params: ConfirmOtpParams,
-    ) -> Result<()> {
-        instructions::otp::confirm_otp(ctx, confirm_otp_params)
-    }
-
-    pub fn set_spending_limit_lamports(
-        ctx: Context<SetSpendingLimitLamports>,
-        amount: u64,
-    ) -> Result<()> {
-        instructions::spending_limit::set_spending_limit_lamports(ctx, amount)
-    }
-
-    pub fn remove_spending_limit_lamports(ctx: Context<RemoveSpendingLimitLamports>) -> Result<()> {
-        instructions::spending_limit::remove_spending_limit_lamports(ctx)
+    pub fn verify_otp(ctx: Context<VerifyOtp>, verify_otp_params: VerifyOtpParams) -> Result<()> {
+        instructions::otp::verify_otp(ctx, verify_otp_params)
     }
 
     pub fn set_spending_limit_spl(
