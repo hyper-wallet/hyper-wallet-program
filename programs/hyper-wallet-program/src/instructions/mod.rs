@@ -1,14 +1,7 @@
-pub use close_hyper_wallet::*;
-pub use create_hyper_wallet::*;
-pub use otp::*;
-pub use spending_limit::*;
-pub use transfer_lamports::*;
-pub use transfer_spl::*;
-pub use whitelist::*;
-pub mod close_hyper_wallet;
-pub mod create_hyper_wallet;
-pub mod otp;
-pub mod spending_limit;
-pub mod transfer_lamports;
-pub mod transfer_spl;
-pub mod whitelist;
+pub use hyper_wallet::*;
+pub use lamports_proposal::*;
+pub use spl_proposal::*;
+
+pub mod hyper_wallet;
+pub mod lamports_proposal;
+pub mod spl_proposal;

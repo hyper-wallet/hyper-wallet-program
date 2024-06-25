@@ -16,12 +16,24 @@ pub fn create_hyper_wallet(
     Ok(())
 }
 
+pub fn close_hyper_wallet(_ctx: Context<CloseHyperWallet>) -> Result<()> {
+    Ok(())
+}
+
 #[derive(Accounts)]
 pub struct CreateHyperWallet<'info> {
     #[account(init, payer = rent_payer, space = HyperWallet::size(5), seeds = [owner.key().as_ref()], bump)]
     pub hyper_wallet: Account<'info, HyperWallet>,
     #[account(mut)]
     pub rent_payer: Signer<'info>,
+    pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct CloseHyperWallet<'info> {
+    #[account(mut, close = owner, seeds = [owner.key().as_ref()], bump)]
+    pub hyper_wallet: Account<'info, HyperWallet>,
     pub owner: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
