@@ -24,7 +24,7 @@ pub fn set_up_otp(ctx: Context<SetUpOtp>, set_up_otp_params: SetUpOtpParams) -> 
 pub fn verify_otp(ctx: Context<VerifyOtp>, verify_otp_params: VerifyOtpParams) -> Result<()> {
     let current_time = Clock::get()?.unix_timestamp;
     let init_time = ctx.accounts.hyper_wallet.otp_init_time;
-    let interval = ((current_time - init_time as i64) / 1) as usize;
+    let interval = ((current_time - init_time as i64) / 30) as usize;
     let proof_hash_copy = verify_otp_params.proof_hash.clone();
     let leave_hash = verify_otp_params.otp_hash;
     let root = ctx.accounts.hyper_wallet.otp_root;
