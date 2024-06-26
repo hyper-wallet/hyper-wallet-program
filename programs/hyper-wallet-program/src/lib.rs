@@ -21,6 +21,10 @@ pub mod hyper_wallet_program {
         instructions::hyper_wallet::close_hyper_wallet(ctx)
     }
 
+    pub fn change_approver(ctx: Context<ChangeApprovers>, new_approver: Pubkey) -> Result<()> {
+        instructions::hyper_wallet::change_approvers(ctx, new_approver)
+    }
+
     pub fn transfer_lamports(ctx: Context<TransferLamports>, lamports: u64) -> Result<()> {
         instructions::transfer_lamports::transfer_lamports(ctx, lamports)
     }
