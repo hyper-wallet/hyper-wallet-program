@@ -8,34 +8,34 @@ pub fn create_transfer_spl_proposal(
     to_ata: Pubkey,
     raw_amount: u64,
 ) -> Result<()> {
-    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    let hyper_business_wallet = &mut ctx.accounts.hyper_business_wallet;
     let proposal = &mut ctx.accounts.proposal;
     let owner = &mut ctx.accounts.owner;
 
-    proposal.hyper_wallet = hyper_wallet.key();
+    proposal.hyper_business_wallet = hyper_business_wallet.key();
     proposal.approved = vec![];
     proposal.status = ProposalStatus::Active;
     proposal.from_ata = from_ata;
     proposal.to_ata = to_ata;
     proposal.raw_amount = raw_amount;
 
-    proposal.approve(owner.key(), hyper_wallet.threshold)?;
+    proposal.approve(owner.key(), hyper_business_wallet.threshold)?;
 
     Ok(())
 }
 
 pub fn approve_transfer_spl_proposal(ctx: Context<ApproveTransferSPLProposal>) -> Result<()> {
-    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    let hyper_business_wallet = &mut ctx.accounts.hyper_business_wallet;
     let proposal = &mut ctx.accounts.proposal;
     let voter = &mut ctx.accounts.voter;
 
-    proposal.approve(voter.key(), hyper_wallet.threshold)?;
+    proposal.approve(voter.key(), hyper_business_wallet.threshold)?;
 
     Ok(())
 }
 
 pub fn execute_transfer_spl_proposal(ctx: Context<ExecuteTransferSPLProposal>) -> Result<()> {
-    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    let hyper_business_wallet = &mut ctx.accounts.hyper_business_wallet;
     let proposal = &mut ctx.accounts.proposal;
     let to_ata = &mut ctx.accounts.to_ata;
     let from_ata = &mut ctx.accounts.from_ata;
@@ -49,7 +49,7 @@ pub fn execute_transfer_spl_proposal(ctx: Context<ExecuteTransferSPLProposal>) -
         ProposalError::InvalidRecipient
     );
 
-    let bump_vector = ctx.bumps.hyper_wallet.to_le_bytes();
+    let bump_vector = ctx.bumps.hyper_business_wallet.to_le_bytes();
     let binding = ctx.accounts.owner.key();
     let inner = vec![binding.as_ref(), bump_vector.as_ref()];
     let outer = vec![inner.as_slice()];
@@ -57,7 +57,7 @@ pub fn execute_transfer_spl_proposal(ctx: Context<ExecuteTransferSPLProposal>) -
     let transfer_instruction = anchor_spl::token::Transfer {
         from: from_ata.to_account_info(),
         to: to_ata.to_account_info(),
-        authority: hyper_wallet.to_account_info(),
+        authority: hyper_business_wallet.to_account_info(),
     };
     let cpi_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
@@ -70,7 +70,7 @@ pub fn execute_transfer_spl_proposal(ctx: Context<ExecuteTransferSPLProposal>) -
 
 #[derive(Accounts)]
 pub struct CreateTransferSPLProposal<'info> {
-    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_business_wallet: Account<'info, HyperBusinessWallet>,
     #[account(
         init,
         payer = rent_payer,
@@ -86,7 +86,7 @@ pub struct CreateTransferSPLProposal<'info> {
 
 #[derive(Accounts)]
 pub struct ApproveTransferSPLProposal<'info> {
-    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_business_wallet: Account<'info, HyperBusinessWallet>,
     #[account(mut)]
     pub proposal: Account<'info, TransferSPLProposal>,
 
@@ -101,7 +101,7 @@ pub struct ExecuteTransferSPLProposal<'info> {
         seeds = [owner.key().as_ref()],
         bump
     )]
-    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_business_wallet: Account<'info, HyperBusinessWallet>,
     #[account(mut)]
     pub proposal: Account<'info, TransferSPLProposal>,
 

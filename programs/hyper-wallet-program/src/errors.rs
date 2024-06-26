@@ -10,4 +10,10 @@ pub enum HyperWalletError {
     AddressAlreadyWhiteListed,
     AddressNotWhiteListed,
     SpendingLimitExceeded,
+    InvalidApprover,
+}
+
+#[error_code]
+pub enum HyperBusinessWalletError {
+    NotAMember,
 }

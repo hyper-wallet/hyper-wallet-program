@@ -4,7 +4,7 @@ pub mod errors;
 pub mod instructions;
 pub mod state;
 
-declare_id!("HYPERhd7VFrTzbRLyGsRcGQZkSfaKUGKAY8XDbaY5AgL");
+declare_id!("HWPtsy7nbqCiszLppXDqizw7w5CQVLhvHY7j9mCnA63R");
 
 #[program]
 pub mod hyper_wallet_program {
@@ -12,15 +12,21 @@ pub mod hyper_wallet_program {
 
     pub fn create_hyper_wallet(
         ctx: Context<CreateHyperWallet>,
-        voters: Vec<Pubkey>,
-        threshold: u8,
-        bump: u8,
+        approvers: Vec<Pubkey>,
     ) -> Result<()> {
-        instructions::hyper_wallet::create_hyper_wallet(ctx, voters, threshold, bump)
+        instructions::hyper_wallet::create_hyper_wallet(ctx, approvers)
     }
 
     pub fn close_hyper_wallet(ctx: Context<CloseHyperWallet>) -> Result<()> {
         instructions::hyper_wallet::close_hyper_wallet(ctx)
+    }
+
+    pub fn transfer_lamports(ctx: Context<TransferLamports>, lamports: u64) -> Result<()> {
+        instructions::transfer_lamports::transfer_lamports(ctx, lamports)
+    }
+
+    pub fn transfer_spl(ctx: Context<TransferSPL>, raw_amount: u64) -> Result<()> {
+        instructions::transfer_spl::transfer_spl(ctx, raw_amount)
     }
 
     pub fn create_transfer_lamports_proposal(

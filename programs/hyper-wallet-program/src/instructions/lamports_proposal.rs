@@ -6,17 +6,17 @@ pub fn create_transfer_lamports_proposal(
     to: Pubkey,
     lamports: u64,
 ) -> Result<()> {
-    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    let hyper_business_wallet = &mut ctx.accounts.hyper_business_wallet;
     let proposal = &mut ctx.accounts.proposal;
     let owner = &mut ctx.accounts.owner;
 
-    proposal.hyper_wallet = hyper_wallet.key();
+    proposal.hyper_business_wallet = hyper_business_wallet.key();
     proposal.approved = vec![];
     proposal.status = ProposalStatus::Active;
     proposal.to = to;
     proposal.lamports = lamports;
 
-    proposal.approve(owner.key(), hyper_wallet.threshold)?;
+    proposal.approve(owner.key(), hyper_business_wallet.threshold)?;
 
     Ok(())
 }
@@ -24,11 +24,11 @@ pub fn create_transfer_lamports_proposal(
 pub fn approve_transfer_lamports_proposal(
     ctx: Context<ApproveTransferLamportsProposal>,
 ) -> Result<()> {
-    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    let hyper_business_wallet = &mut ctx.accounts.hyper_business_wallet;
     let proposal = &mut ctx.accounts.proposal;
     let voter = &mut ctx.accounts.voter;
 
-    proposal.approve(voter.key(), hyper_wallet.threshold)?;
+    proposal.approve(voter.key(), hyper_business_wallet.threshold)?;
 
     Ok(())
 }
@@ -36,7 +36,7 @@ pub fn approve_transfer_lamports_proposal(
 pub fn execute_transfer_lamports_proposal(
     ctx: Context<ExecuteTransferLamportsProposal>,
 ) -> Result<()> {
-    let hyper_wallet = &mut ctx.accounts.hyper_wallet;
+    let hyper_business_wallet = &mut ctx.accounts.hyper_business_wallet;
     let proposal = &mut ctx.accounts.proposal;
     let to = &mut ctx.accounts.to;
 
@@ -46,7 +46,7 @@ pub fn execute_transfer_lamports_proposal(
     );
     require!(proposal.to == to.key(), ProposalError::InvalidRecipient);
 
-    hyper_wallet.sub_lamports(ctx.accounts.proposal.lamports)?;
+    hyper_business_wallet.sub_lamports(ctx.accounts.proposal.lamports)?;
     to.add_lamports(ctx.accounts.proposal.lamports)?;
 
     Ok(())
@@ -54,7 +54,7 @@ pub fn execute_transfer_lamports_proposal(
 
 #[derive(Accounts)]
 pub struct CreateTransferLamportsProposal<'info> {
-    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_business_wallet: Account<'info, HyperBusinessWallet>,
     #[account(
         init,
         payer = rent_payer,
@@ -70,7 +70,7 @@ pub struct CreateTransferLamportsProposal<'info> {
 
 #[derive(Accounts)]
 pub struct ApproveTransferLamportsProposal<'info> {
-    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_business_wallet: Account<'info, HyperBusinessWallet>,
     #[account(mut)]
     pub proposal: Account<'info, TransferLamportProposal>,
 
@@ -81,7 +81,7 @@ pub struct ApproveTransferLamportsProposal<'info> {
 #[derive(Accounts)]
 pub struct ExecuteTransferLamportsProposal<'info> {
     #[account(mut)]
-    pub hyper_wallet: Account<'info, HyperWallet>,
+    pub hyper_business_wallet: Account<'info, HyperBusinessWallet>,
     #[account(mut)]
     pub proposal: Account<'info, TransferLamportProposal>,
 

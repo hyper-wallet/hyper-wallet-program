@@ -5,13 +5,13 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-hyper_wallet_program = "HYPERhd7VFrTzbRLyGsRcGQZkSfaKUGKAY8XDbaY5AgL"
+hyper_wallet_program = "HWPtsy7nbqCiszLppXDqizw7w5CQVLhvHY7j9mCnA63R"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "/Users/ducnh/.config/solana/id.json"
 
 [scripts]
